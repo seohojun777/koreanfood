@@ -1,0 +1,33 @@
+---
+// heroImage는 로컬 이미지(ImageMetadata) 또는 원격 URL(string) 둘 다 올 수 있다.
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+	src: ImageMetadata | string;
+	alt: string;
+	width: number;
+	height: number;
+	loading?: 'eager' | 'lazy';
+}
+
+const { src, alt, width, height, loading = 'lazy' } = Astro.props;
+---
+
+{
+	typeof src === 'string' ? (
+		<img src={src} alt={alt} width={width} height={height} loading={loading} decoding="async" />
+	) : (
+		<Image src={src} alt={alt} width={width} height={height} loading={loading} />
+	)
+}
+
+<style>
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 2 / 1;
+		object-fit: cover;
+	}
+</style>

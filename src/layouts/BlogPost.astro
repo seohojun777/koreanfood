@@ -1,86 +1,143 @@
 ---
-import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import PostImage from '../components/PostImage.astro';
+import { SITE_AUTHOR, SITE_TITLE } from '../consts';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, heroImageAlt, category, tags } =
+	Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const imageURL = heroImage
+	? new URL(typeof heroImage === 'string' ? heroImage : heroImage.src, Astro.site ?? Astro.url)
+	: undefined;
+
+// 검색엔진용 구조화 데이터 (BlogPosting)
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: title,
+	description,
+	datePublished: pubDate.toISOString(),
+	dateModified: (updatedDate ?? pubDate).toISOString(),
+	mainEntityOfPage: canonicalURL.href,
+	inLanguage: 'ko-KR',
+	...(imageURL && { image: [imageURL.href] }),
+	...(tags.length > 0 && { keywords: tags.join(', ') }),
+	author: { '@type': 'Person', name: SITE_AUTHOR },
+	publisher: { '@type': 'Organization', name: SITE_TITLE },
+};
 ---
 
-<html lang="en">
+<!doctype html>
+<html lang="ko">
 	<head>
-		<BaseHead title={title} description={description} />
+		<BaseHead
+			title={title}
+			description={description}
+			image={heroImage}
+			type="article"
+			publishedTime={pubDate}
+			modifiedTime={updatedDate}
+		/>
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
-			}
-			.hero-image {
-				width: 100%;
-			}
-			.hero-image img {
-				display: block;
+			.head {
+				max-width: var(--narrow);
 				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
+				padding: 3.5rem 1.25rem 2rem;
 				text-align: center;
-				line-height: 1;
 			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
+			.category {
+				display: inline-block;
+				margin-bottom: 1.2rem;
+				padding: 0.15rem 0.7rem;
+				border: 1px solid var(--ink);
+				font-size: 0.8rem;
+				letter-spacing: 0.1em;
+				color: var(--ink);
 			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
+			.head h1 {
+				margin-bottom: 1rem;
 			}
-			.last-updated-on {
-				font-style: italic;
+			.meta {
+				color: var(--muted);
+				font-size: 0.9rem;
+			}
+			.hero {
+				max-width: var(--wide);
+				margin: 0 auto;
+				padding: 0 1.25rem;
+			}
+			main {
+				padding-top: 2.5rem;
+			}
+			.tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin: 3.5rem 0 0;
+				padding: 1.5rem 0 0;
+				border-top: 1px solid var(--line);
+				list-style: none;
+			}
+			.tags li {
+				padding: 0.1rem 0.65rem;
+				background: var(--paper);
+				font-size: 0.82rem;
+				color: var(--muted);
 			}
 		</style>
 	</head>
 
 	<body>
 		<Header />
-		<main>
-			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+		<article>
+			<div class="head">
+				{category && <span class="category">{category}</span>}
+				<h1>{title}</h1>
+				<div class="meta">
+					<FormattedDate date={pubDate} />
+					{
+						updatedDate && (
+							<>
+								{' · '}수정 <FormattedDate date={updatedDate} />
+							</>
+						)
+					}
 				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1>{title}</h1>
-						<hr />
+			</div>
+			{
+				heroImage && (
+					<div class="hero">
+						<PostImage
+							src={heroImage}
+							alt={heroImageAlt ?? title}
+							width={1080}
+							height={540}
+							loading="eager"
+						/>
 					</div>
-					<slot />
-				</div>
-			</article>
-		</main>
+				)
+			}
+			<main class="prose">
+				<slot />
+				{
+					tags.length > 0 && (
+						<ul class="tags" aria-label="태그">
+							{tags.map((tag) => (
+								<li>#{tag}</li>
+							))}
+						</ul>
+					)
+				}
+			</main>
+		</article>
 		<Footer />
 	</body>
 </html>

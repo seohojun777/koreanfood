@@ -1,22 +1,144 @@
-## Development
+# 오늘의 한 상 — 한식 블로그 운영 가이드
 
-When starting the dev server, use background mode:
+Astro로 만든 **수익화 목적의 한식 블로그**다. 검색 유입(SEO)을 늘려 광고 수익을 내는 것이 목표다.
 
+---
+
+## 1. "새 글 작성" 명령
+
+사용자가 **"새 글 작성"** 이라고만 말하면, 추가 질문 없이 아래 절차대로 글 한 편을 `.md` 파일로 완성한다.
+
+### 작업 순서
+
+1. **기존 주제 확인** — `src/content/blog/`의 모든 글의 `title`, `tags`를 읽고, 겹치지 않는 **새로운 주제**를 고른다.
+   - 같은 음식이라도 각도가 완전히 다르면 허용한다 (예: "김치찌개 레시피" 다음에 "김치찌개 지역별 차이"). 단, 연달아 비슷한 주제는 피한다.
+   - 카테고리를 골고루 돌린다: `레시피` / `제철 식재료` / `한식 이야기` / `반찬·밑반찬` / `상차림 팁`
+2. **키워드 잡기** — 사람들이 실제로 검색할 법한 메인 키워드 1개와 연관 키워드 3~5개를 정한다.
+   (예: 메인 `된장찌개 끓이는 법`, 연관 `된장찌개 황금레시피`, `차돌 된장찌개`, `된장찌개 맛있게`)
+3. **사진 찾기** — `node scripts/find-photo.mjs "<영문 검색어>"`로 Unsplash 무료 사진을 검색한다. (자세한 규칙은 4장)
+4. **글 작성** — `src/content/blog/<영문-슬러그>.md`로 저장한다.
+5. **분량 검사** — `node scripts/count-chars.mjs src/content/blog/<파일>.md` 실행 → **공백 포함 5,000자 이상**이 나올 때까지 보강한다.
+6. **빌드 확인** — `npm run build`가 에러 없이 끝나는지 확인한다.
+7. 사용자에게 제목, 메인 키워드, 글자 수, 파일 경로를 짧게 보고한다.
+
+### 파일 이름 (URL 슬러그)
+
+- 영문 소문자 + 하이픈, 음식 이름은 로마자 표기: `doenjang-jjigae-recipe.md`, `spring-namul-guide.md`
+- 짧고 핵심 키워드가 드러나게 (3~5 단어)
+
+### frontmatter 형식
+
+```yaml
+---
+title: '된장찌개 맛있게 끓이는 법, 식당 맛 나는 비결 5가지'
+description: '집에서 끓이면 늘 2% 부족한 된장찌개, 쌀뜨물과 된장 푸는 순서만 바꿔도 맛이 확 달라집니다. 재료 손질부터 불 조절까지 정리했어요.'
+pubDate: '2026-09-27'
+heroImage: 'https://images.unsplash.com/photo-xxxx?w=1600&q=80&auto=format&fit=crop'
+heroImageAlt: '뚝배기에 보글보글 끓고 있는 된장찌개'
+category: '레시피'
+tags: ['된장찌개', '된장찌개 레시피', '찌개 요리', '집밥']
+---
 ```
-astro dev --background
+
+- `pubDate`는 **작성하는 날의 날짜**
+- `tags`는 4~6개, 검색 키워드 위주
+
+---
+
+## 2. SEO 작성 규칙
+
+- **제목(title)**: 메인 키워드를 **앞쪽**에 넣는다. 25~40자. 숫자나 궁금증을 주는 표현을 활용한다.
+  (좋은 예: `잡채 불지 않게 만드는 법, 당면 삶는 시간이 핵심입니다`)
+- **설명(description)**: 메인 키워드를 포함해 80~150자. 검색 결과에 그대로 노출되므로 클릭하고 싶게 쓴다.
+- **도입부 첫 2~3문장** 안에 메인 키워드를 자연스럽게 넣는다.
+- **소제목 구조**: 본문 소제목은 `##`(H2), 그 아래는 `###`(H3). **`#`(H1)은 쓰지 않는다** — 제목은 레이아웃이 H1로 출력한다.
+- H2 소제목은 5~8개. 소제목에도 연관 키워드를 섞는다.
+- 키워드를 억지로 반복하지 않는다. 같은 문장이 어색해지면 동의어나 풀어쓰기를 쓴다.
+- 레시피 글에는 **재료 표**(`| 재료 | 분량 |`)와 **번호 목록 조리 순서**를 넣는다. 검색엔진이 구조를 잘 읽는다.
+- 글 끝부분에 **"자주 묻는 질문"** 섹션(`## 자주 묻는 질문`, 질문은 `###`)으로 3~5개 Q&A를 넣는다.
+- 영양 정보, 역사, 수치 같은 사실은 **확실한 것만** 쓴다. 모르면 쓰지 않는다. (틀린 정보는 신뢰도와 검색 순위를 둘 다 깎는다)
+
+---
+
+## 3. 문체 — AI 티 나지 않게
+
+수익화에 가장 중요한 부분이다. **사람이 직접 해 먹어보고 쓴 블로그 글**처럼 써야 한다.
+
+### 이렇게 쓴다
+
+- 기본 말투는 **"~요", "~더라고요", "~거든요"** 같은 편안한 존댓말. 가끔 "~다" 체 독백을 섞어도 좋다.
+- 문장 길이를 들쭉날쭉하게. 짧게 끊는 문장도 쓴다. "근데 이게 핵심이에요."
+- 경험담·감정·구체적인 장면을 넣는다: "처음엔 된장을 너무 일찍 넣어서 텁텁했어요", "냄비 뚜껑 열 때 냄새부터 다르거든요".
+- 실패담, 솔직한 평가, 개인 취향을 넣는다: "솔직히 이 방법은 좀 번거로워서 저는 잘 안 해요."
+- 독자에게 말 거는 문장: "혹시 이런 적 없으세요?"
+- 정보는 **문단(줄글) 위주**로 풀어 쓰고, 목록은 재료·순서처럼 꼭 필요한 곳에만 쓴다.
+
+### 이런 표현은 쓰지 않는다
+
+- "~에 대해 알아보겠습니다", "~를 소개해 드리겠습니다", "오늘은 ~에 대해 이야기해보려 합니다"
+- "결론적으로", "요약하자면", "종합해 보면", "다양한", "특별한", "완벽한", "풍부한 맛"의 남발
+- "~는 매우 중요합니다", "~하는 것이 좋습니다"만 반복하는 교과서 말투
+- 모든 문단이 같은 길이, 모든 소제목 아래 목록 3개씩 같은 기계적인 구조
+- 이모지 남발, 굵은 글씨 남발 (굵은 글씨는 글 전체에서 5~8군데 정도)
+- 마지막에 "도움이 되셨길 바랍니다!" 같은 뻔한 맺음말. 대신 개인적인 한마디로 끝낸다.
+
+---
+
+## 4. 사진 규칙
+
+- 글마다 **대표 이미지(heroImage) 1장 + 본문 사진 1장 이상** (총 2장 이상 권장).
+- 사진은 반드시 **무료 사진 사이트**에서 가져온다. 기본은 Unsplash:
+  ```bash
+  node scripts/find-photo.mjs "doenjang stew" 8
+  ```
+  - 스크립트는 유료(Unsplash+) 사진을 자동으로 걸러낸다.
+  - 검색어는 **영문**으로 (예: `korean side dishes`, `bibimbap`, `kimchi`, `korean table`).
+  - 설명(alt_description)을 보고 **글 내용과 실제로 맞는 사진**을 고른다. 한식이 아닌 사진(일식·중식 등)은 쓰지 않는다.
+- 본문에 넣는 형식 (사진 바로 아래 줄에 기울임체로 출처 캡션):
+  ```markdown
+  ![뚝배기에 담긴 된장찌개와 두부](https://images.unsplash.com/photo-xxxx?w=1600&q=80&auto=format&fit=crop)
+
+  *Photo by 작가이름 on Unsplash*
+  ```
+- `alt` 텍스트는 **한국어로 사진을 구체적으로 설명**한다 (이미지 검색 SEO).
+- 사진은 소제목 사이사이에 배치하고, 한 곳에 몰지 않는다.
+
+---
+
+## 5. 분량과 구성
+
+- **본문 공백 포함 5,000자 이상** (`scripts/count-chars.mjs`로 반드시 확인). 6,000~7,000자가 가장 안정적이다.
+- 추천 흐름:
+  1. 도입 — 공감되는 상황이나 경험으로 시작 (키워드 포함)
+  2. 본론 H2 소제목 5~8개 — 재료/고르는 법/만드는 법/실패 줄이는 팁/응용/보관법 등
+  3. 자주 묻는 질문
+  4. 맺음 — 개인적인 한마디
+- 분량을 채우려고 같은 말을 반복하지 않는다. 부족하면 **팁, 실패 사례, 응용 방법, 보관법, 곁들이면 좋은 음식** 같은 실제 정보를 더한다.
+
+---
+
+## 6. 프로젝트 구조
+
+| 경로 | 역할 |
+| --- | --- |
+| `src/content/blog/` | 블로그 글(.md) |
+| `src/content.config.ts` | frontmatter 스키마 |
+| `src/consts.ts` | 사이트 이름·설명 |
+| `src/layouts/BlogPost.astro` | 글 상세 레이아웃 (SEO 메타, JSON-LD 구조화 데이터 포함) |
+| `src/components/` | 헤더, 푸터, 글 목록, 이미지 컴포넌트 |
+| `src/styles/global.css` | 흑백 테마 전체 스타일 |
+| `scripts/find-photo.mjs` | Unsplash 무료 사진 검색 |
+| `scripts/count-chars.mjs` | 본문 글자 수 검사 |
+
+- 테마는 **흑백**(먹색 `#111` + 흰 바탕)을 유지한다. 새 UI를 만들 때 컬러 포인트를 추가하지 않는다.
+- 폰트: 본문 Pretendard, 제목 Noto Serif KR.
+- 배포 전 `astro.config.mjs`의 `site`를 실제 도메인으로 바꿔야 sitemap·canonical·RSS가 올바르게 생성된다.
+
+## 7. 개발 서버
+
+```bash
+npm run dev      # http://localhost:4321
+npm run build    # 배포용 빌드 (글 작성 후 에러 확인용)
 ```
 
-Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
-
-## Documentation
-
-Full documentation: https://docs.astro.build
-
-Consult these guides before working on related tasks:
-
-- [Adding pages, dynamic routes, or middleware](https://docs.astro.build/en/guides/routing/)
-- [Working with Astro components](https://docs.astro.build/en/basics/astro-components/)
-- [Using React, Vue, Svelte, or other framework components](https://docs.astro.build/en/guides/framework-components/)
-- [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
-- [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
-- [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+Astro 공식 문서: https://docs.astro.build

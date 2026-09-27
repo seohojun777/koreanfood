@@ -13,7 +13,11 @@ const blog = defineCollection({
 			// Transform string to Date object
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
-			heroImage: z.optional(image()),
+			// 로컬 이미지 또는 무료 사진 사이트의 원격 이미지 URL
+			heroImage: z.union([image(), z.string().url()]).optional(),
+			heroImageAlt: z.string().optional(),
+			category: z.string().optional(),
+			tags: z.array(z.string()).default([]),
 		}),
 });
 
