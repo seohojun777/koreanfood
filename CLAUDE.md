@@ -141,4 +141,13 @@ npm run dev      # http://localhost:4321
 npm run build    # 배포용 빌드 (글 작성 후 에러 확인용)
 ```
 
+### Windows 스마트 앱 컨트롤 관련 주의
+
+이 PC는 Windows **스마트 앱 컨트롤**이 켜져 있어서, 서명 없는 Astro 컴파일러 네이티브 파일(`astro.win32-x64-msvc.node`)이 차단된다.
+그래서 `@astrojs/compiler-binding-wasm32-wasi`(WASM 버전)를 의존성에 추가해 두었고, 네이티브가 막히면 자동으로 WASM으로 동작한다.
+
+- `node_modules`를 새로 설치할 때는 `npm install --force`로 설치한다 (WASM 패키지는 CPU 조건이 달라 `--force` 없이는 설치가 거부된다).
+- 빌드 중 `An Application Control policy has blocked this file` 오류가 나면 이 패키지가 `node_modules/@astrojs/`에 있는지 먼저 확인한다.
+- Linux 서버(Vercel 등)에 배포할 때 설치 오류가 나면 설치 명령을 `npm install --force`로 설정한다.
+
 Astro 공식 문서: https://docs.astro.build
