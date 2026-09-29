@@ -126,6 +126,7 @@ tags: ['된장찌개', '된장찌개 레시피', '찌개 요리', '집밥']
 | `src/consts.ts` | 사이트 이름·설명 |
 | `src/layouts/BlogPost.astro` | 글 상세 레이아웃 (SEO 메타, JSON-LD 구조화 데이터 포함) |
 | `src/components/` | 헤더, 푸터, 글 목록, 이미지 컴포넌트 |
+| `src/components/CoupangBanner.astro` | 쿠팡 파트너스 배너 (모든 글 본문 하단에 자동 삽입, 대가성 문구 포함) |
 | `src/styles/global.css` | 흑백 테마 전체 스타일 |
 | `scripts/find-photo.mjs` | Unsplash 무료 사진 검색 |
 | `scripts/count-chars.mjs` | 본문 글자 수 검사 |

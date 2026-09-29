@@ -1,0 +1,41 @@
+---
+// 쿠팡 파트너스 다이나믹 배너. 공정위 지침에 따라 대가성 문구를 함께 표시한다.
+---
+
+<aside class="coupang" aria-label="쿠팡 파트너스 광고">
+	<script is:inline src="https://ads-partners.coupang.com/g.js"></script>
+	<script is:inline>
+		new PartnersCoupang.G({
+			id: 1034120,
+			template: 'carousel',
+			trackingCode: 'AF8082923',
+			width: '680',
+			height: '140',
+			tsource: '',
+		});
+	</script>
+	<p class="disclosure">
+		이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+	</p>
+</aside>
+
+<style>
+	.coupang {
+		margin: 3.5rem 0 0;
+		padding: 1rem 0 0;
+		border-top: 1px solid var(--line);
+		overflow: hidden;
+		text-align: center;
+	}
+	.coupang :global(iframe) {
+		display: block;
+		max-width: 100%;
+		margin: 0 auto;
+	}
+	.disclosure {
+		margin: 0.6rem 0 0;
+		font-size: 0.75rem;
+		line-height: 1.5;
+		color: var(--muted);
+	}
+</style>

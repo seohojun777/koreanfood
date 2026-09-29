@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
+import CoupangBanner from '../components/CoupangBanner.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
@@ -127,6 +128,7 @@ const jsonLd = {
 			}
 			<main class="prose">
 				<slot />
+				<CoupangBanner />
 				{
 					tags.length > 0 && (
 						<ul class="tags" aria-label="태그">
